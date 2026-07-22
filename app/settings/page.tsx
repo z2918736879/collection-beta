@@ -91,7 +91,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="shell pb-24 pt-[calc(52px+clamp(4rem,10vh,7rem))]">
+    <div className="shell pb-24 pt-[calc(var(--nav-h)+clamp(4rem,10vh,7rem))]">
       <Reveal>
         <p className="type-eyebrow">Settings</p>
         <h1 className="type-title mt-2">設定</h1>

@@ -105,7 +105,7 @@ function CollectionBody() {
   }
 
   return (
-    <div className="shell pb-40 pt-[calc(52px+clamp(4rem,10vh,7rem))]">
+    <div className="shell pb-40 pt-[calc(var(--nav-h)+clamp(4rem,10vh,7rem))]">
       {/* 標題區：大面積左對齊留白 */}
       <Reveal>
         <p className="type-eyebrow">Archive</p>
@@ -216,7 +216,7 @@ function CollectionBody() {
            桌機：置中膠囊。底部再加上 iPhone home indicator 的安全區。 */
         <div
           className="pointer-events-none fixed inset-x-4 z-50 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2"
-          style={{ bottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
+          style={{ bottom: "calc(1.25rem + var(--safe-bottom))" }}
         >
           <div
             className="glass pointer-events-auto flex w-full items-center justify-between gap-1.5 px-2.5 py-2.5 sm:w-auto sm:gap-2"

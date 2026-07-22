@@ -42,7 +42,12 @@ export function Nav() {
         backdropFilter: scrolled ? "blur(40px) saturate(180%)" : "none",
         WebkitBackdropFilter: scrolled ? "blur(40px) saturate(180%)" : "none",
         borderBottom: `1px solid ${scrolled ? "var(--hairline)" : "transparent"}`,
-        transition: "all 0.5s var(--ease-standard)",
+        // 只動該動的屬性 —— 用 all 會連 padding 一起動畫，
+        // 安全區在旋轉螢幕時改變，那會變成一段莫名其妙的位移
+        transition:
+          "background 0.5s var(--ease-standard), backdrop-filter 0.5s var(--ease-standard), border-color 0.5s var(--ease-standard)",
+        // 讓出狀態列高度，否則連結會壓在時間與電量底下
+        paddingTop: "var(--safe-top)",
       }}
     >
       <nav className="shell flex h-[52px] items-center justify-between">

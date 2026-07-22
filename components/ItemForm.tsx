@@ -118,7 +118,7 @@ export function ItemForm({ existing }: { existing?: CollectibleItem }) {
   }
 
   return (
-    <div className="shell pb-24 pt-[calc(52px+clamp(3rem,8vh,5rem))]">
+    <div className="shell pb-24 pt-[calc(var(--nav-h)+clamp(3rem,8vh,5rem))]">
       <p className="type-eyebrow">{existing ? "Edit" : "New"}</p>
       <h1 className="type-title mt-2">{existing ? "編輯藏品" : "新增藏品"}</h1>
 

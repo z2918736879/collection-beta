@@ -63,7 +63,7 @@ export default function ItemPage({
     item.price && `${item.currency} ${Number(item.price).toLocaleString()}`;
 
   return (
-    <div className="shell pb-24 pt-[calc(52px+clamp(2.5rem,7vh,4.5rem))]">
+    <div className="shell pb-24 pt-[calc(var(--nav-h)+clamp(2.5rem,7vh,4.5rem))]">
       <Reveal>
         <Link
           href="/collection"

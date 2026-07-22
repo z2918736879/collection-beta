@@ -48,7 +48,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="shell flex min-h-[100svh] flex-col items-center justify-center py-20">
+    <div className="shell flex min-h-[100svh] flex-col items-center justify-center pb-20 pt-[calc(var(--nav-h)+2rem)]">
       <Reveal className="stage w-full max-w-[360px]">
         <VinylMark size={132} />
 

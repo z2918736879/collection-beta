@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       {/* ---------- 首屏：單一焦點置中 ---------- */}
-      <section className="shell flex min-h-[100svh] flex-col items-center justify-center pt-[52px]">
+      <section className="shell flex min-h-[100svh] flex-col items-center justify-center pt-[var(--nav-h)]">
         <Reveal className="stage">
           <p className="type-eyebrow">Collection</p>
           <h1 className="type-display measure">為收藏而生。</h1>

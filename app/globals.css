@@ -8,6 +8,13 @@
 /* ---------- 1. 主題變數 ---------- */
 
 :root {
+  /* iOS 安全區。加入主畫面後狀態列是半透明的，內容會延伸到時間與
+     電量底下，必須主動讓位。桌機與 Android 一律解析為 0px。
+     抽成變數是為了讓導覽列總高只算一次，各頁不必各自拼接。 */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-h: calc(52px + var(--safe-top));
+
   /* 珍珠白 —— Apple 標準的極淺暖白，非純白，避免螢幕刺眼 */
   --bg: #fbfbfd;
   --bg-deep: #f2f2f5;
@@ -261,12 +268,14 @@ body {
 
 /* ---------- 6. 版面 ---------- */
 
-/* 內容最大寬 1120px，兩側大量留白 */
+/* 內容最大寬 1120px，兩側大量留白。
+   橫向持握時瀏海會吃掉側邊，取兩者較大值讓文字不被切到。 */
 .shell {
   width: 100%;
   max-width: 1120px;
   margin-inline: auto;
-  padding-inline: clamp(1.5rem, 6vw, 4rem);
+  padding-left: max(clamp(1.5rem, 6vw, 4rem), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(1.5rem, 6vw, 4rem), env(safe-area-inset-right, 0px));
 }
 
 /* 每個區塊的垂直呼吸：留白率的主要來源 */
