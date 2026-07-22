@@ -1,10 +1,14 @@
 /**
  * 產生 PWA 圖示（加到主畫面後顯示的 app 圖示）。
  *
- *   node scripts/gen-icons.mjs                    使用內建的黑膠幾何圖形
- *   node scripts/gen-icons.mjs my-cover.jpg       改用你自己的圖片
+ *   node scripts/gen-icons.mjs                       使用內建的黑膠幾何圖形
+ *   node scripts/gen-icons.mjs my-cover.jpg          改用你自己的圖片
+ *   node scripts/gen-icons.mjs my-cover.jpg top      指定裁切位置
  *
- * 支援 jpg / png / webp / svg。來源圖不必是正方形，會自動置中裁切。
+ * 支援 jpg / png / webp / svg。來源圖不必是正方形，預設置中裁切。
+ * 裁切位置可選 center（預設）／top／bottom／left／right／attention。
+ * attention 會自動偵測畫面中最醒目的區域；直幅人像通常用 top 最好，
+ * 因為圖示在主畫面上只有約 60px，臉必須落在正中央才認得出來。
  *
  * 換圖之後：iOS 會把主畫面圖示快取得很死，必須先長按刪除舊書籤，
  * 再從 Safari 重新「加入主畫面」才會看到新圖。
@@ -22,6 +26,27 @@ const source = process.argv[2] ? resolve(process.argv[2]) : null;
 
 if (source && !existsSync(source)) {
   console.error(`找不到檔案：${source}`);
+  process.exit(1);
+}
+
+const POSITIONS = {
+  center: "centre",
+  centre: "centre",
+  top: "top",
+  bottom: "bottom",
+  left: "left",
+  right: "right",
+  attention: sharp.strategy.attention,
+  entropy: sharp.strategy.entropy,
+};
+
+const positionArg = (process.argv[3] ?? "center").toLowerCase();
+const position = POSITIONS[positionArg];
+
+if (!position) {
+  console.error(
+    `不認得的裁切位置：${positionArg}\n可用值：${Object.keys(POSITIONS).join(" / ")}`,
+  );
   process.exit(1);
 }
 
@@ -90,7 +115,7 @@ async function renderFromImage(file, size, inset) {
   const offset = Math.round((size - inner) / 2);
 
   const scaled = await sharp(file)
-    .resize(inner, inner, { fit: "cover", position: "centre" })
+    .resize(inner, inner, { fit: "cover", position })
     .toBuffer();
 
   // 一律鋪上不透明底色：iOS 的主畫面圖示不支援透明，
@@ -132,6 +157,6 @@ for (const t of targets) {
 
 console.log(
   source
-    ? `\n來源：${source}\n\n記得 commit 並部署，然後在 iPhone 上刪除舊書籤再重新加入主畫面。`
-    : "\n使用內建黑膠圖形。要改用自己的圖片：node scripts/gen-icons.mjs 圖片路徑",
+    ? `\n來源：${source}（裁切：${positionArg}）\n\n記得 commit 並部署，然後在 iPhone 上刪除舊書籤再重新加入主畫面。`
+    : "\n使用內建黑膠圖形。要改用自己的圖片：node scripts/gen-icons.mjs 圖片路徑 [裁切位置]",
 );
