@@ -4,8 +4,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createItem, deleteItem, updateItem } from "@/lib/db";
 import { CURRENCIES, TYPE_META, TYPE_ORDER } from "@/lib/schema";
-import { useObjectUrl } from "@/lib/useObjectUrl";
-import type { CollectibleItem, ItemDraft, ItemType } from "@/lib/types";
+import { useCoverUrl } from "@/lib/useSignedUrl";
+import type {
+  CollectibleItem,
+  CoverChange,
+  ItemDraft,
+  ItemType,
+} from "@/lib/types";
 
 const EMPTY: ItemDraft = {
   type: "vinyl",
@@ -43,17 +48,26 @@ export function ItemForm({ existing }: { existing?: CollectibleItem }) {
   const [draft, setDraft] = useState<ItemDraft>(EMPTY);
   const [tagText, setTagText] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  /** undefined = 封面未異動、null = 要刪除、File = 要上傳新的 */
+  const [coverChange, setCoverChange] = useState<CoverChange>(undefined);
 
   useEffect(() => {
     if (!existing) return;
-    const { id, createdAt, updatedAt, ...rest } = existing;
+    const { id, coverPath, createdAt, updatedAt, ...rest } = existing;
     setDraft(rest);
     setTagText(rest.tags.join(", "));
   }, [existing]);
 
   const meta = TYPE_META[draft.type];
-  const coverUrl = useObjectUrl(draft.cover);
+
+  // 未異動時顯示雲端既有封面，否則顯示本機新選的檔案
+  const coverUrl = useCoverUrl(
+    coverChange === undefined ? (existing?.coverPath ?? null) : coverChange,
+  );
+  const hasCover = coverChange instanceof File || (coverChange === undefined && !!existing?.coverPath);
 
   const set = <K extends keyof ItemDraft>(key: K, value: ItemDraft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
@@ -66,6 +80,7 @@ export function ItemForm({ existing }: { existing?: CollectibleItem }) {
   async function save() {
     if (!canSave || saving) return;
     setSaving(true);
+    setError("");
 
     const payload: ItemDraft = {
       ...draft,
@@ -78,21 +93,28 @@ export function ItemForm({ existing }: { existing?: CollectibleItem }) {
 
     try {
       if (existing) {
-        await updateItem(existing.id, payload);
+        await updateItem(existing.id, payload, coverChange);
         router.push(`/collection/${existing.id}`);
       } else {
-        const id = await createItem(payload);
+        const id = await createItem(payload, coverChange);
         router.push(`/collection/${id}`);
       }
-    } finally {
+    } catch (e) {
+      // 雲端會失敗，本機資料庫不會 —— 錯誤一定要讓使用者看見
+      setError(e instanceof Error ? e.message : "儲存失敗，請再試一次。");
       setSaving(false);
     }
   }
 
   async function remove() {
     if (!existing) return;
-    await deleteItem(existing.id);
-    router.push("/collection");
+    try {
+      await deleteItem(existing.id);
+      router.push("/collection");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "刪除失敗，請再試一次。");
+      setConfirmDelete(false);
+    }
   }
 
   return (
@@ -137,13 +159,13 @@ export function ItemForm({ existing }: { existing?: CollectibleItem }) {
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) set("cover", file);
+              if (file) setCoverChange(file);
             }}
           />
 
-          {draft.cover && (
+          {hasCover && (
             <button
-              onClick={() => set("cover", undefined)}
+              onClick={() => setCoverChange(null)}
               className="type-caption mt-3 block w-full text-center transition-opacity hover:opacity-60"
             >
               移除封面
@@ -308,6 +330,12 @@ export function ItemForm({ existing }: { existing?: CollectibleItem }) {
           </section>
 
           <hr className="hairline" />
+
+          {error && (
+            <p className="text-[0.8125rem]" style={{ color: "#ff453a" }}>
+              {error}
+            </p>
+          )}
 
           <div className="flex flex-wrap items-center gap-3">
             <button

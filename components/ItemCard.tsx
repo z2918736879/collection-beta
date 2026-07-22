@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useObjectUrl } from "@/lib/useObjectUrl";
+import { useCoverUrl } from "@/lib/useSignedUrl";
 import { TYPE_META } from "@/lib/schema";
 import type { CollectibleItem } from "@/lib/types";
 
@@ -34,7 +34,7 @@ function SelectMark({ selected }: { selected: boolean }) {
 }
 
 function CardBody({ item }: { item: CollectibleItem }) {
-  const cover = useObjectUrl(item.cover);
+  const cover = useCoverUrl(item.coverPath);
   const meta = TYPE_META[item.type];
 
   return (

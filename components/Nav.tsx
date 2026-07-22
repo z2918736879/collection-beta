@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "./AuthProvider";
 import { useTheme } from "./ThemeProvider";
 
 /**
@@ -12,6 +13,7 @@ import { useTheme } from "./ThemeProvider";
 export function Nav() {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
+  const { session, loading } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -21,11 +23,16 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const links = [
-    { href: "/collection", label: "收藏" },
-    { href: "/collection/new", label: "新增" },
-    { href: "/settings", label: "設定" },
-  ];
+  // 未登入時只留登入入口，避免點進去才被彈回來
+  const links = session
+    ? [
+        { href: "/collection", label: "收藏" },
+        { href: "/collection/new", label: "新增" },
+        { href: "/settings", label: "設定" },
+      ]
+    : loading
+      ? []
+      : [{ href: "/login", label: "登入" }];
 
   return (
     <header

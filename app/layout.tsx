@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Aurora } from "@/components/Aurora";
 import { Nav } from "@/components/Nav";
+import { AuthProvider } from "@/components/AuthProvider";
 import { ServiceWorker } from "@/components/ServiceWorker";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
@@ -58,16 +59,18 @@ export default function RootLayout({
       </head>
       <body className="grain">
         <ThemeProvider>
-          <ServiceWorker />
-          <Aurora />
-          <Nav />
-          <main className="relative z-0">{children}</main>
-          <footer className="shell pb-16 pt-24">
-            <hr className="hairline mb-8" />
-            <p className="type-eyebrow text-center">
-              Collection — 本機儲存，資料不離開這台裝置
-            </p>
-          </footer>
+          <AuthProvider>
+            <ServiceWorker />
+            <Aurora />
+            <Nav />
+            <main className="relative z-0">{children}</main>
+            <footer className="shell pb-16 pt-24">
+              <hr className="hairline mb-8" />
+              <p className="type-eyebrow text-center">
+                Collection — 資料以個人帳號隔離儲存
+              </p>
+            </footer>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

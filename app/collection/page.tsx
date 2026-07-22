@@ -113,7 +113,7 @@ function CollectionBody() {
         <p className="type-body mt-3 max-w-[36ch]">
           {items === null
             ? "讀取中…"
-            : `${counts.all} 件藏品，儲存在這台裝置上。`}
+            : `${counts.all} 件藏品。`}
         </p>
       </Reveal>
 

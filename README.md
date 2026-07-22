@@ -1,6 +1,6 @@
 # Collection
 
-卡牌、黑膠與器物的收藏目錄。資料存於瀏覽器 IndexedDB，不離開本機。
+卡牌、黑膠與器物的收藏目錄。資料存於 Supabase，可在任何裝置登入取用。
 
 ## 啟動
 
@@ -9,6 +9,8 @@
 ```bash
 npm install
 ```
+
+複製 `.env.example` 為 `.env.local` 並填入 Supabase 的專案網址與 publishable 金鑰。
 
 ```bash
 npm run dev
@@ -37,7 +39,9 @@ components/
 lib/
   types.ts                   資料模型
   schema.ts                  各品類的欄位定義（新增品類從這裡改）
-  db.ts                      IndexedDB 存取與 JSON 匯出／匯入
+  supabase.ts                Supabase client（publishable 金鑰）
+  db.ts                      資料存取、封面上傳與 JSON 匯出／匯入
+  useSignedUrl.ts            Storage 路徑換簽章網址
 ```
 
 ## 設計規範
@@ -62,7 +66,7 @@ lib/
 ## 手機與部署
 
 這是一個 PWA，部署後可在手機「加入主畫面」，變成獨立 app：無網址列、可離線、
-並且**繞過 iOS Safari 對一般網站 IndexedDB 的 7 天清除政策**。
+體驗接近原生 app。
 
 部署（不需要 GitHub）：
 
@@ -82,8 +86,18 @@ npx vercel --prod
 node scripts/gen-icons.mjs
 ```
 
-**資料不會跨裝置同步。** IndexedDB 綁定「裝置 + 瀏覽器」，手機開啟時是空的收藏。
-目前的橋樑是設定頁的 JSON 匯出／匯入。
+部署到 Vercel 時，記得在專案設定加入 `.env.local` 裡的那兩個環境變數。
+
+## 安全模型
+
+publishable 金鑰會被打包進前端資源，屬於公開資訊 —— 這是 Supabase 的設計。
+資料隔離**完全依靠** `supabase/schema.sql` 裡的 Row Level Security 政策，
+由 Postgres 在每次查詢時強制加上 `auth.uid() = user_id` 條件。
+
+前端的 `RequireAuth` 只是體驗層的導向，不是安全邊界。
+
+**每次改動 `schema.sql` 之後，務必重跑一次未授權存取測試**：
+以 publishable 金鑰直接打 `/rest/v1/items`，讀取應回傳 0 筆、寫入應被 401 拒絕。
 
 ## 擴充
 

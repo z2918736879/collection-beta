@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { Reveal } from "@/components/Reveal";
 import { useTheme } from "@/components/ThemeProvider";
 import { exportJSON, importJSON, listItems } from "@/lib/db";
@@ -33,6 +34,7 @@ function SettingRow({
 
 export default function SettingsPage() {
   const { theme, toggle } = useTheme();
+  const { email, signOut } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [count, setCount] = useState<number | null>(null);
@@ -94,12 +96,26 @@ export default function SettingsPage() {
         <p className="type-eyebrow">Settings</p>
         <h1 className="type-title mt-2">設定</h1>
         <p className="type-body mt-3 max-w-[38ch]">
-          目前共 {count ?? "—"} 件藏品，全部儲存在這台裝置的瀏覽器中。
+          目前共 {count ?? "—"} 件藏品，儲存於雲端，可在任何裝置登入取用。
         </p>
       </Reveal>
 
-      <Reveal delay={120}>
+      <Reveal delay={100}>
         <section className="mt-[clamp(3rem,8vh,5rem)]">
+          <h2 className="type-eyebrow mb-2">帳號</h2>
+          <SettingRow
+            title={email ?? "已登入"}
+            description="收藏資料以此帳號隔離，其他人即使拿到網址也讀不到。"
+          >
+            <button onClick={signOut} className="btn btn-ghost">
+              登出
+            </button>
+          </SettingRow>
+        </section>
+      </Reveal>
+
+      <Reveal delay={160}>
+        <section className="mt-[clamp(2.5rem,6vh,4rem)]">
           <h2 className="type-eyebrow mb-2">外觀</h2>
           <SettingRow
             title="主題"
@@ -112,13 +128,13 @@ export default function SettingsPage() {
         </section>
       </Reveal>
 
-      <Reveal delay={200}>
+      <Reveal delay={220}>
         <section className="mt-[clamp(2.5rem,6vh,4rem)]">
           <h2 className="type-eyebrow mb-2">備份</h2>
 
           <SettingRow
             title="匯出為 JSON"
-            description="包含所有欄位與封面圖片，單一檔案即可完整還原。建議定期備份 —— 清除瀏覽器資料會一併刪掉收藏。"
+            description="包含所有欄位與封面圖片，單一檔案即可完整還原。雲端雖然不會因清除瀏覽器而遺失，但誤刪無法復原，定期備份仍有價值。"
           >
             <button
               onClick={handleExport}

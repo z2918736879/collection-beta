@@ -5,7 +5,7 @@ import { use, useEffect, useState } from "react";
 import { Reveal } from "@/components/Reveal";
 import { getItem } from "@/lib/db";
 import { TYPE_META } from "@/lib/schema";
-import { useObjectUrl } from "@/lib/useObjectUrl";
+import { useCoverUrl } from "@/lib/useSignedUrl";
 import type { CollectibleItem } from "@/lib/types";
 
 /** metadata 表列：左標籤右數值，以髮絲線分隔，數字等寬對齊 */
@@ -31,7 +31,7 @@ export default function ItemPage({
 }) {
   const { id } = use(params);
   const [item, setItem] = useState<CollectibleItem | null | undefined>(undefined);
-  const cover = useObjectUrl(item?.cover);
+  const cover = useCoverUrl(item?.coverPath);
 
   useEffect(() => {
     getItem(id)
