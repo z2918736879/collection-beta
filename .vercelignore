@@ -1,0 +1,8 @@
+# 相依套件與建置產物由 Vercel 在雲端自行安裝與產生，不需要上傳
+node_modules
+.next
+out
+
+# 本機開發用設定
+.claude
+*.log
