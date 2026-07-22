@@ -8,16 +8,16 @@ import { ItemCard } from "@/components/ItemCard";
 import { Reveal } from "@/components/Reveal";
 import { deleteItems, listItems } from "@/lib/db";
 import { TYPE_META, TYPE_ORDER } from "@/lib/schema";
+import { compareItems, SORT_LABELS, SORT_ORDER, type SortKey } from "@/lib/sort";
 import type { CollectibleItem, ItemType } from "@/lib/types";
 
 type Filter = ItemType | "all";
-type Sort = "updated" | "title" | "year";
 
 function CollectionBody() {
   const params = useSearchParams();
   const [items, setItems] = useState<CollectibleItem[] | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
-  const [sort, setSort] = useState<Sort>("updated");
+  const [sort, setSort] = useState<SortKey>("updated");
   const [query, setQuery] = useState("");
 
   const [selectMode, setSelectMode] = useState(false);
@@ -53,11 +53,7 @@ function CollectionBody() {
           .toLowerCase()
           .includes(q);
       })
-      .sort((a, b) => {
-        if (sort === "title") return a.title.localeCompare(b.title, "zh-Hant");
-        if (sort === "year") return (b.year || "").localeCompare(a.year || "");
-        return b.updatedAt - a.updatedAt;
-      });
+      .sort((a, b) => compareItems(a, b, sort));
   }, [items, filter, sort, query]);
 
   const counts = useMemo(() => {
@@ -153,12 +149,18 @@ function CollectionBody() {
             />
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
+              onChange={(e) => setSort(e.target.value as SortKey)}
+              aria-label="排序方式"
               className="field !h-9 !w-auto shrink-0 !rounded-full !text-[0.8125rem]"
             >
-              <option value="updated">最近更新</option>
-              <option value="title">名稱</option>
-              <option value="year">年份</option>
+              {SORT_ORDER.map((key) => (
+                <option key={key} value={key}>
+                  {/* 篩了特定品類時，「作者」換成該品類的說法（黑膠是藝人、卡牌是系列） */}
+                  {key === "subtitle" && filter !== "all"
+                    ? TYPE_META[filter].subtitleLabel
+                    : SORT_LABELS[key]}
+                </option>
+              ))}
             </select>
             {counts.all > 0 && (
               <button
