@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CoverConstellation } from "@/components/CoverConstellation";
 import { CardMark, ObjectMark, VinylMark } from "@/components/Marks";
 import { Reveal } from "@/components/Reveal";
 import { TYPE_META, TYPE_ORDER } from "@/lib/schema";
@@ -22,8 +23,8 @@ export default function Home() {
           </p>
         </Reveal>
 
-        <Reveal delay={180} className="my-[clamp(3rem,7vh,5.5rem)]">
-          <VinylMark size={360} />
+        <Reveal delay={180} className="my-[clamp(2rem,6vh,4.5rem)]">
+          <CoverConstellation size={460} />
         </Reveal>
 
         <Reveal delay={320} className="flex flex-wrap justify-center gap-3">
