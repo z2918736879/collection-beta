@@ -16,7 +16,7 @@ export default function Home() {
       <section className="shell flex min-h-[100svh] flex-col items-center justify-center pt-[var(--nav-h)]">
         <Reveal className="stage">
           <p className="type-eyebrow">Collection</p>
-          <h1 className="type-display measure">為收藏而生。</h1>
+          <h1 className="type-display measure">收藏庫</h1>
           <p className="type-body measure">
             卡牌、黑膠、器物。一處安靜的目錄，記下每一件的來歷與樣貌。
           </p>

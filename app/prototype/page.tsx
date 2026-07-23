@@ -37,7 +37,7 @@ function PrototypeBody() {
     <section className="shell flex min-h-[100svh] flex-col items-center justify-center pt-[var(--nav-h)]">
       <Reveal className="stage">
         <p className="type-eyebrow">Prototype{isDemo && " · Demo"}</p>
-        <h1 className="type-display measure">為收藏而生。</h1>
+        <h1 className="type-display measure">收藏庫</h1>
         <p className="type-body measure">
           滑動游標，封面會隨之浮動；點一張即可進入該藏品。
         </p>

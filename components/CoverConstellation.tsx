@@ -44,6 +44,16 @@ interface Placed {
   slot: Slot;
 }
 
+/** Fisher–Yates 洗牌，回傳新陣列不動原資料。 */
+function shuffle<T>(arr: T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 export function CoverConstellation({
   size = 460,
   /** 傳入時直接用這些圖，不查資料庫 —— 供無登入的視覺驗證使用 */
@@ -93,11 +103,10 @@ export function CoverConstellation({
     (async () => {
       try {
         const items = await listItems();
-        // 精選優先，其次最近更新；只取有封面的
-        const withCover = items
-          .filter((it) => it.coverPath)
-          .sort((a, b) => Number(b.favorite) - Number(a.favorite))
-          .slice(0, SLOTS.length);
+        // 每次隨機挑選，讓每次開啟看到的收藏都不同
+        const withCover = shuffle(
+          items.filter((it) => it.coverPath),
+        ).slice(0, SLOTS.length);
 
         if (withCover.length === 0) {
           if (!cancelled) setFailed(true);
