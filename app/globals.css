@@ -442,6 +442,22 @@ textarea.field {
   }
 }
 
+/* 封面星系的緩慢漂移：各封面以不同相位上下浮動，幅度極小 */
+@keyframes constellation-float {
+  0%,
+  100% {
+    transform: translateY(-3%);
+  }
+  50% {
+    transform: translateY(3%);
+  }
+}
+
+.constellation-float {
+  animation: constellation-float ease-in-out infinite;
+  will-change: transform;
+}
+
 /* 尊重系統的減少動態偏好設定 */
 @media (prefers-reduced-motion: reduce) {
   *,
