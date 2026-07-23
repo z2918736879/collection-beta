@@ -93,7 +93,7 @@ export default function ItemPage({
                 <img
                   src={cover}
                   alt={item.title}
-                  className="h-full w-full object-cover"
+                  className={`h-full w-full ${item.type === "card" ? "object-contain" : "object-cover"}`}
                 />
               ) : (
                 <div

@@ -51,7 +51,11 @@ function CardBody({ item }: { item: CollectibleItem }) {
           <img
             src={cover}
             alt={item.title}
-            className="h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]"
+            // 卡牌用 contain 完整呈現，避免裁掉邊框與卡號；
+            // 黑膠與器物封面本就近正方，用 cover 填滿更好看
+            className={`h-full w-full transition-transform duration-[900ms] group-hover:scale-[1.04] ${
+              item.type === "card" ? "object-contain" : "object-cover"
+            }`}
             style={{ transitionTimingFunction: "var(--ease-standard)" }}
           />
         ) : (

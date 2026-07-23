@@ -140,7 +140,7 @@ export function ItemForm({ existing }: { existing?: CollectibleItem }) {
               <img
                 src={coverUrl}
                 alt="封面"
-                className="h-full w-full object-cover"
+                className={`h-full w-full ${draft.type === "card" ? "object-contain" : "object-cover"}`}
               />
             ) : (
               <span

@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { Reveal } from "@/components/Reveal";
 import { useTheme } from "@/components/ThemeProvider";
 import { exportJSON, importJSON, listItems } from "@/lib/db";
+import { TYPE_META, TYPE_ORDER } from "@/lib/schema";
+import { computeTotals, formatMoney } from "@/lib/totals";
+import type { CollectibleItem } from "@/lib/types";
 
 /** 設定列：左側說明、右側動作，以髮絲線分隔 */
 function SettingRow({
@@ -37,18 +40,24 @@ export default function SettingsPage() {
   const { email, signOut } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [count, setCount] = useState<number | null>(null);
+  const [items, setItems] = useState<CollectibleItem[] | null>(null);
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
 
   const refresh = () =>
     listItems()
-      .then((items) => setCount(items.length))
-      .catch(() => setCount(0));
+      .then(setItems)
+      .catch(() => setItems([]));
 
   useEffect(() => {
     refresh();
   }, []);
+
+  const count = items?.length ?? null;
+  const totals = useMemo(
+    () => (items ? computeTotals(items, TYPE_ORDER) : []),
+    [items],
+  );
 
   async function handleExport() {
     if (busy) return;
@@ -114,7 +123,55 @@ export default function SettingsPage() {
         </section>
       </Reveal>
 
-      <Reveal delay={160}>
+      <Reveal delay={140}>
+        <section className="mt-[clamp(2.5rem,6vh,4rem)]">
+          <h2 className="type-eyebrow mb-5">總花費</h2>
+
+          {/* 每個品類獨立一張卡，幣別分列 —— 不同幣別不相加 */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            {totals.map((t) => (
+              <div
+                key={t.type}
+                className="glass p-5"
+                style={{
+                  borderRadius: "var(--radius-card)",
+                  boxShadow: "var(--shadow-float)",
+                }}
+              >
+                <p className="type-eyebrow">{TYPE_META[t.type].en}</p>
+                <p className="mt-1 text-[0.9375rem] font-medium tracking-[-0.015em]">
+                  {TYPE_META[t.type].label}
+                </p>
+
+                <div className="mt-4 space-y-1.5">
+                  {t.byCurrency.length === 0 ? (
+                    <p className="type-caption">
+                      {t.itemCount === 0 ? "尚無藏品" : "尚未記錄價格"}
+                    </p>
+                  ) : (
+                    t.byCurrency.map((c) => (
+                      <p
+                        key={c.currency}
+                        className="tabular text-[1.0625rem] tracking-[-0.02em]"
+                      >
+                        {formatMoney(c.currency, c.total)}
+                      </p>
+                    ))
+                  )}
+                </div>
+
+                <p className="type-caption mt-3">
+                  {t.itemCount} 件
+                  {t.pricedCount < t.itemCount &&
+                    ` · ${t.itemCount - t.pricedCount} 件未記錄`}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </Reveal>
+
+      <Reveal delay={200}>
         <section className="mt-[clamp(2.5rem,6vh,4rem)]">
           <h2 className="type-eyebrow mb-2">外觀</h2>
           <SettingRow
